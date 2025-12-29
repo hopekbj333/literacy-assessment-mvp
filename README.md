@@ -108,6 +108,98 @@ mvp-web-assessment/
 2. 또는 이 HTML5 버전을 그대로 사용
 3. 추가 기능 개발 (결과 저장, 리포트 등)
 
+## 🌐 배포하기
+
+이 웹앱은 정적 파일로 구성되어 있어 다양한 플랫폼에 쉽게 배포할 수 있습니다. **마이크 접근을 위해 HTTPS가 필수**입니다.
+
+### 방법 1: Netlify (가장 쉬움, 추천)
+
+**옵션 A: 드래그 앤 드롭 (가장 빠름)**
+1. [Netlify](https://www.netlify.com/)에 가입/로그인
+2. 대시보드에서 "Sites" → "Add new site" → "Deploy manually"
+3. 프로젝트 폴더 전체를 드래그 앤 드롭
+4. 배포 완료! HTTPS URL 자동 생성
+
+**옵션 B: Git 연동**
+1. GitHub/GitLab/Bitbucket에 코드 푸시
+2. Netlify에서 "Import from Git" 선택
+3. 저장소 연결 후 배포 설정:
+   - Build command: (비워둠)
+   - Publish directory: `.` (또는 비워둠)
+4. "Deploy site" 클릭
+
+**옵션 C: Netlify CLI**
+```bash
+# Netlify CLI 설치
+npm install -g netlify-cli
+
+# 로그인
+netlify login
+
+# 배포
+netlify deploy --prod
+```
+
+### 방법 2: Vercel
+
+**옵션 A: 웹 인터페이스**
+1. [Vercel](https://vercel.com/)에 가입/로그인
+2. "Add New Project" 클릭
+3. GitHub/GitLab/Bitbucket 저장소 연결
+4. 프로젝트 설정:
+   - Framework Preset: "Other"
+   - Root Directory: `.`
+5. "Deploy" 클릭
+
+**옵션 B: Vercel CLI**
+```bash
+# Vercel CLI 설치
+npm install -g vercel
+
+# 배포
+vercel --prod
+```
+
+### 방법 3: GitHub Pages
+
+1. GitHub 저장소 생성 및 코드 푸시
+2. 저장소 Settings → Pages
+3. Source: "Deploy from a branch" 선택
+4. Branch: `main` (또는 `master`), `/ (root)` 선택
+5. Save 후 몇 분 후 `https://[사용자명].github.io/[저장소명]` 접속
+
+**참고**: GitHub Pages는 HTTPS를 자동 제공합니다.
+
+### 방법 4: Firebase Hosting
+
+```bash
+# Firebase CLI 설치
+npm install -g firebase-tools
+
+# 로그인
+firebase login
+
+# 프로젝트 초기화
+firebase init hosting
+
+# 배포
+firebase deploy --only hosting
+```
+
+### 배포 후 확인사항
+
+✅ **HTTPS 확인**: URL이 `https://`로 시작하는지 확인  
+✅ **마이크 권한 테스트**: 실제 배포된 사이트에서 마이크 접근 권한 요청 확인  
+✅ **브라우저 호환성**: Chrome, Edge, Firefox에서 테스트  
+✅ **모바일 테스트**: 스마트폰에서도 정상 작동 확인
+
+### 커스텀 도메인 연결
+
+대부분의 호스팅 서비스에서 무료로 커스텀 도메인을 연결할 수 있습니다:
+- **Netlify**: Site settings → Domain management
+- **Vercel**: Project settings → Domains
+- **GitHub Pages**: Repository settings → Pages → Custom domain
+
 ## 📄 라이선스
 
 이 프로젝트는 원본 프로젝트의 일부입니다.

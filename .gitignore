@@ -1,16 +1,22 @@
-# OS
+# 운영체제 파일
 .DS_Store
 Thumbs.db
 
-# IDE
+# 에디터 설정
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
-# Logs
+# 로그 파일
 *.log
+npm-debug.log*
 
 # 임시 파일
 *.tmp
 *.temp
+
+# 환경 변수 파일 (필요시)
+.env
+.env.local
