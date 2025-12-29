@@ -1,0 +1,124 @@
+{
+  "examples": [
+    {
+      "itemId": "ex_001",
+      "question": "'고추잠자리'에서 '고추'를 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "잠자리",
+      "itemData": {"word": "고추잠자리", "target": "고추", "result": "잠자리"}
+    },
+    {
+      "itemId": "ex_002",
+      "question": "'종이접기'에서 '종이'를 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "접기",
+      "itemData": {"word": "종이접기", "target": "종이", "result": "접기"}
+    },
+    {
+      "itemId": "ex_003",
+      "question": "'우주여행'에서 '우주'를 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "여행",
+      "itemData": {"word": "우주여행", "target": "우주", "result": "여행"}
+    }
+  ],
+  "main": [
+    {
+      "itemId": "del_001",
+      "question": "'생일케이크'에서 '생일'을 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "케이크"
+    },
+    {
+      "itemId": "del_002",
+      "question": "'놀이공원'에서 '놀이'를 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "공원"
+    },
+    {
+      "itemId": "del_003",
+      "question": "'가위바위보'에서 '가위'를 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "바위보"
+    },
+    {
+      "itemId": "del_004",
+      "question": "'할아버지'에서 '할'을 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "아버지"
+    },
+    {
+      "itemId": "del_005",
+      "question": "'아기공룡'에서 '아기'를 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "공룡"
+    },
+    {
+      "itemId": "del_006",
+      "question": "'술래잡기'에서 '술래'를 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "잡기"
+    },
+    {
+      "itemId": "del_007",
+      "question": "'막대사탕'에서 '막대'를 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "사탕"
+    },
+    {
+      "itemId": "del_008",
+      "question": "'그네타기'에서 '그네'를 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "타기"
+    },
+    {
+      "itemId": "del_009",
+      "question": "'텔레비전'에서 '텔레'를 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "비전"
+    },
+    {
+      "itemId": "del_010",
+      "question": "'요구르트'에서 '요구'를 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "르트"
+    },
+    {
+      "itemId": "del_011",
+      "question": "'숨바꼭질'에서 '숨바'를 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "꼭질"
+    },
+    {
+      "itemId": "del_012",
+      "question": "'어린이집'에서 '어린'을 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "이집"
+    },
+    {
+      "itemId": "del_013",
+      "question": "'초등학교'에서 '초등'을 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "학교"
+    },
+    {
+      "itemId": "del_014",
+      "question": "'스케치북'에서 '스케'를 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "치북"
+    },
+    {
+      "itemId": "del_015",
+      "question": "'강아지'에서 '강'을 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "아지"
+    },
+    {
+      "itemId": "del_016",
+      "question": "'병아리'에서 '병'을 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "아리"
+    },
+    {
+      "itemId": "del_017",
+      "question": "'선생님'에서 '선'을 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "생님"
+    },
+    {
+      "itemId": "del_018",
+      "question": "'친구들'에서 '친'을 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "구들"
+    },
+    {
+      "itemId": "del_019",
+      "question": "'거북이'에서 '거'를 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "북이"
+    },
+    {
+      "itemId": "del_020",
+      "question": "'장난감'에서 '장'을 빼고 나머지 소리를 말해 주세요.",
+      "correctAnswer": "난감"
+    }
+  ]
+}

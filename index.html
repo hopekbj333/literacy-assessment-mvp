@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>문해력 기초 검사 - MVP</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 시작 화면 -->
+        <div id="intro-screen" class="screen active">
+            <h1>음운처리능력 검사</h1>
+            <button id="start-btn" class="btn btn-primary">검사 시작</button>
+        </div>
+
+        <!-- 검사 연습 안내 화면 -->
+        <div id="practice-intro-screen" class="screen">
+            <h2>검사 안내</h2>
+            <div class="icon-container" style="display: flex; flex-direction: column; gap: 30px; justify-content: center; align-items: center; margin: 30px 0;">
+                <div class="speaker-icon" id="practice-intro-speaker" style="cursor: pointer;">
+                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 3L9 6H6C4.9 6 4 6.9 4 8V16C4 17.1 4.9 18 6 18H9L12 21V3Z" fill="currentColor"/>
+                        <path d="M16.5 12C16.5 10.23 15.5 8.71 14 7.97V16.02C15.5 15.29 16.5 13.77 16.5 12Z" fill="currentColor"/>
+                        <path d="M19 10V14C19 15.1 18.5 16.1 17.7 16.8L16.2 15.3C16.7 14.9 17 14.5 17 14V10C17 9.5 16.7 9.1 16.2 8.7L17.7 7.2C18.5 7.9 19 8.9 19 10Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <button id="practice-intro-mic-btn" class="record-btn" style="background: transparent; border: none; cursor: pointer; display: none;">
+                    <svg id="practice-mic-icon" width="120" height="120" viewBox="0 0 24 24" fill="#667eea">
+                        <path d="M12 14C13.1 14 14 13.1 14 12V6C14 4.9 13.1 4 12 4S10 4.9 10 6V12C10 13.1 10.9 14 12 14Z"/>
+                        <path d="M17 12C17 14.8 14.8 17 12 17S7 14.8 7 12H5C5 15.3 7.7 18 11 18V20H13V18C16.3 18 19 15.3 19 12H17Z"/>
+                    </svg>
+                    <svg id="practice-stop-icon" width="120" height="120" viewBox="0 0 24 24" fill="#667eea" style="display: none;">
+                        <rect x="6" y="6" width="12" height="12" rx="2"/>
+                    </svg>
+                </button>
+                <div class="mic-icon-display" id="practice-mic-display" style="width: 120px; height: 120px; color: #667eea; display: flex; align-items: center; justify-content: center;">
+                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 14C13.1 14 14 13.1 14 12V6C14 4.9 13.1 4 12 4S10 4.9 10 6V12C10 13.1 10.9 14 12 14Z" fill="currentColor"/>
+                        <path d="M17 12C17 14.8 14.8 17 12 17S7 14.8 7 12H5C5 15.3 7.7 18 11 18V20H13V18C16.3 18 19 15.3 19 12H17Z" fill="currentColor"/>
+                    </svg>
+                </div>
+            </div>
+            <button id="practice-start-btn" class="btn btn-primary" disabled style="opacity: 0.5; cursor: not-allowed;">연습1로 이동</button>
+        </div>
+
+        <!-- 문항 화면 -->
+        <div id="question-screen" class="screen">
+            <div class="header">
+                <h2 id="question-title">연습문제1</h2>
+            </div>
+            
+            <div class="content">
+                <!-- 스피커 아이콘 (중앙) -->
+                <div class="speaker-icon" id="question-speaker" style="cursor: pointer;">
+                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 3L9 6H6C4.9 6 4 6.9 4 8V16C4 17.1 4.9 18 6 18H9L12 21V3Z" fill="currentColor"/>
+                        <path d="M16.5 12C16.5 10.23 15.5 8.71 14 7.97V16.02C15.5 15.29 16.5 13.77 16.5 12Z" fill="currentColor"/>
+                        <path d="M19 10V14C19 15.1 18.5 16.1 17.7 16.8L16.2 15.3C16.7 14.9 17 14.5 17 14V10C17 9.5 16.7 9.1 16.2 8.7L17.7 7.2C18.5 7.9 19 8.9 19 10Z" fill="currentColor"/>
+                    </svg>
+                </div>
+
+                <!-- 녹음 버튼 -->
+                <div class="recording-section">
+                    <button id="record-btn" class="record-btn">
+                        <svg id="mic-icon" width="60" height="60" viewBox="0 0 24 24" fill="white">
+                            <path d="M12 14C13.1 14 14 13.1 14 12V6C14 4.9 13.1 4 12 4S10 4.9 10 6V12C10 13.1 10.9 14 12 14Z"/>
+                            <path d="M17 12C17 14.8 14.8 17 12 17S7 14.8 7 12H5C5 15.3 7.7 18 11 18V20H13V18C16.3 18 19 15.3 19 12H17Z"/>
+                        </svg>
+                        <svg id="stop-icon" width="60" height="60" viewBox="0 0 24 24" fill="white" style="display: none;">
+                            <rect x="6" y="6" width="12" height="12" rx="2"/>
+                        </svg>
+                    </button>
+
+                    <!-- 녹음 시간 -->
+                    <div id="recording-time" class="recording-time" style="display: none;">
+                        00:00
+                    </div>
+
+                    <!-- 음성 인식 결과 (연습문제) -->
+                    <div id="recognition-result" class="recognition-result" style="display: none;">
+                        <p>인식 중: <span id="recognized-text"></span></p>
+                    </div>
+
+                    <!-- 녹음 완료 메시지 -->
+                    <div id="recording-complete" class="recording-complete" style="display: none;">
+                        녹음 완료
+                    </div>
+
+                    <!-- 정답 확인 결과 (연습문제) -->
+                    <div id="answer-feedback" class="answer-feedback" style="display: none;">
+                        <div id="feedback-icon"></div>
+                        <p id="feedback-text"></p>
+                        <p id="recognized-answer" class="recognized-answer"></p>
+                    </div>
+
+                    <!-- 녹음 재생 버튼 (연습문제) -->
+                    <div id="playback-section" class="playback-section" style="display: none;">
+                        <button id="play-btn" class="play-btn">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M8 5V19L19 12L8 5Z"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- 연습문제 이동 버튼 (연습문제만) -->
+                    <button id="practice-next-btn" class="btn btn-primary" style="display: none; margin-top: 20px;">
+                        연습2로 이동
+                    </button>
+                </div>
+            </div>
+
+            <!-- 다음 버튼 -->
+            <div class="footer">
+                <button id="next-btn" class="btn btn-primary" style="display: none;">
+                    다음 문제로 →
+                </button>
+            </div>
+
+            <!-- 문항 네비게이션 -->
+            <div class="question-nav">
+                <div id="question-numbers" class="question-numbers"></div>
+            </div>
+        </div>
+
+        <!-- 결과 화면 -->
+        <div id="result-screen" class="screen">
+            <h1>검사 완료</h1>
+            <div id="result-summary" class="result-summary"></div>
+            <button id="restart-btn" class="btn btn-primary">끝</button>
+        </div>
+    </div>
+
+    <script src="js/recorder.js"></script>
+    <script src="js/stt.js"></script>
+    <script src="js/assessment.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
