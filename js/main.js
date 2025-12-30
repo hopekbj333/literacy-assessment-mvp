@@ -6,6 +6,7 @@
 let assessment = null;
 let audioRecorder = null;
 let speechRecognizer = null;
+let ttsManager = null; // TTS 매니저
 let currentRecordingBlobUrl = null;
 let currentAudioPlayer = null;
 let isPracticeIntroPlaying = false; // 검사 연습 안내 멘트 재생 중 여부
@@ -18,15 +19,60 @@ document.addEventListener('DOMContentLoaded', () => {
     assessment = new Assessment();
     audioRecorder = new AudioRecorder();
     speechRecognizer = new SpeechRecognizer();
+    ttsManager = new TTSManager(); // TTS 매니저 초기화
     
     // 음성 인식 초기화
     if (!speechRecognizer.initialize()) {
         console.warn('음성 인식 기능을 사용할 수 없습니다');
     }
 
+    // TTS 음성 목록 로드 대기 후 콘솔 헬퍼 함수 설정
+    setTimeout(() => {
+        setupTTSHelpers();
+    }, 500);
+
     // 이벤트 리스너 설정
     setupEventListeners();
 });
+
+/**
+ * TTS 콘솔 헬퍼 함수 설정 (디버깅 및 테스트용)
+ */
+function setupTTSHelpers() {
+    // 전역 함수로 등록 (콘솔에서 사용 가능)
+    window.listTTSVoices = () => {
+        return ttsManager.listVoices();
+    };
+
+    window.selectTTSVoice = (voiceIdentifier) => {
+        return ttsManager.selectVoice(voiceIdentifier);
+    };
+
+    window.getCurrentTTSVoice = () => {
+        const voice = ttsManager.getSelectedVoice();
+        if (voice) {
+            console.log('현재 선택된 음성:', voice.name, voice.lang);
+            return voice;
+        }
+        return null;
+    };
+
+    window.testTTSVoice = (voiceIdentifier, text = '안녕하세요. 음성 테스트입니다.') => {
+        const success = ttsManager.selectVoice(voiceIdentifier);
+        if (success) {
+            ttsManager.speak(text);
+            console.log('음성 테스트 재생 중...');
+        }
+        return success;
+    };
+
+    console.log('🎤 TTS 헬퍼 함수가 준비되었습니다!');
+    console.log('사용 방법:');
+    console.log('  - listTTSVoices() : 사용 가능한 음성 목록 보기');
+    console.log('  - selectTTSVoice(이름 또는 인덱스) : 음성 변경');
+    console.log('  - getCurrentTTSVoice() : 현재 선택된 음성 확인');
+    console.log('  - testTTSVoice(이름 또는 인덱스, "테스트 문장") : 음성 테스트');
+}
 
 /**
  * 이벤트 리스너 설정
@@ -35,7 +81,7 @@ function setupEventListeners() {
     // 시작 버튼
     document.getElementById('start-btn').addEventListener('click', () => {
         // 기존 TTS 재생 중지
-        speechSynthesis.cancel();
+        ttsManager.cancel();
         
         showScreen('practice-intro-screen');
         // 화면 전환 완료 후 충분한 시간 대기 (2.5초)
@@ -96,7 +142,7 @@ function setupEventListeners() {
     // 끝 버튼 (처음 화면으로 이동)
     document.getElementById('restart-btn').addEventListener('click', () => {
         // TTS 중지
-        speechSynthesis.cancel();
+        ttsManager.cancel();
         
         // 녹음 중지
         if (audioRecorder.isRecording) {
@@ -151,7 +197,7 @@ function playPracticeIntroMessage() {
     
     // 멘트1 재생
     // TTS 큐 완전히 비우기
-    speechSynthesis.cancel();
+    ttsManager.cancel();
     
     // TTS가 완전히 준비될 때까지 충분히 대기
     setTimeout(() => {
@@ -161,30 +207,22 @@ function playPracticeIntroMessage() {
         // 전체 문장을 하나로 재생
         const message1 = '지금부터 음운처리능력 검사를 안내합니다. 첫째, 묻는 말을 다시 듣고 싶으면 스피커 모양을 누르면 됩니다. 지금 눌러 보세요.';
         
-        const utterance1 = new SpeechSynthesisUtterance(message1);
-        utterance1.lang = 'ko-KR';
-        utterance1.rate = 0.7;
-        utterance1.volume = 1.0;
-        utterance1.pitch = 1.0;
-
-        utterance1.onstart = () => {
-            console.log('멘트1 재생 시작:', message1);
-        };
-
-        utterance1.onend = () => {
-            speaker.classList.remove('active');
-            isPracticeIntroPlaying = false;
-            // 스피커 클릭 대기
-            isWaitingForSpeakerClick = true;
-            practiceIntroStep = 1;
-        };
-
-        utterance1.onerror = (event) => {
-            console.error('TTS 오류:', event);
-        };
-
-        // 전체 문장 재생 시작
-        speechSynthesis.speak(utterance1);
+        ttsManager.speak(message1, {
+            rate: 0.8,
+            onStart: () => {
+                console.log('멘트1 재생 시작:', message1);
+            },
+            onEnd: () => {
+                speaker.classList.remove('active');
+                isPracticeIntroPlaying = false;
+                // 스피커 클릭 대기
+                isWaitingForSpeakerClick = true;
+                practiceIntroStep = 1;
+            },
+            onError: (event) => {
+                console.error('TTS 오류:', event);
+            }
+        });
     }, 1000);
 }
 
@@ -207,19 +245,16 @@ function handlePracticeIntroSpeakerClick() {
         isPracticeIntroPlaying = true;
         
         const message2 = '잘 했습니다.';
-        const utterance2 = new SpeechSynthesisUtterance(message2);
-        utterance2.lang = 'ko-KR';
-        utterance2.rate = 0.7;
-        
-        utterance2.onend = () => {
-            speaker.classList.remove('active');
-            isPracticeIntroPlaying = false;
-            practiceIntroStep = 2;
-            // 멘트3 재생
-            playPracticeIntroMessage3();
-        };
-        
-        speechSynthesis.speak(utterance2);
+        ttsManager.speak(message2, {
+            rate: 0.8,
+            onEnd: () => {
+                speaker.classList.remove('active');
+                isPracticeIntroPlaying = false;
+                practiceIntroStep = 2;
+                // 멘트3 재생
+                playPracticeIntroMessage3();
+            }
+        });
     }
 }
 
@@ -236,21 +271,18 @@ function playPracticeIntroMessage3() {
     
     const message3 = '둘째, 묻는 말에 답을 할 때는 마이크 모양을 누릅니다. 그리고 잠시 후 답을 말하고, 말이 끝나면 멈춤 버튼을 누르면 됩니다. 마이크 모양을 눌러 보세요.';
     
-    const utterance3 = new SpeechSynthesisUtterance(message3);
-    utterance3.lang = 'ko-KR';
-    utterance3.rate = 0.7;
-    
-    utterance3.onend = () => {
-        speaker.classList.remove('active');
-        isPracticeIntroPlaying = false;
-        practiceIntroStep = 3;
-        // 마이크 버튼 표시 및 대기 (마이크 디스플레이는 숨김)
-        micDisplay.style.display = 'none';
-        micBtn.style.display = 'block';
-        isWaitingForMicRecording = true;
-    };
-    
-    speechSynthesis.speak(utterance3);
+    ttsManager.speak(message3, {
+        rate: 0.8,
+        onEnd: () => {
+            speaker.classList.remove('active');
+            isPracticeIntroPlaying = false;
+            practiceIntroStep = 3;
+            // 마이크 버튼 표시 및 대기 (마이크 디스플레이는 숨김)
+            micDisplay.style.display = 'none';
+            micBtn.style.display = 'block';
+            isWaitingForMicRecording = true;
+        }
+    });
 }
 
 /**
@@ -317,23 +349,20 @@ function onPracticeIntroRecordingComplete() {
     
     // 멘트4 재생
     const message4 = '모두 잘 했습니다. 준비가 다 되었으면 연습1로 이동 버튼을 눌러 주세요.';
-    const utterance4 = new SpeechSynthesisUtterance(message4);
-    utterance4.lang = 'ko-KR';
-    utterance4.rate = 0.7;
-    
-    utterance4.onend = () => {
-        practiceIntroStep = 6;
-        // 연습1로 이동 버튼 활성화 (마이크 버튼은 숨기고, 마이크 디스플레이는 다시 표시)
-        const practiceStartBtn = document.getElementById('practice-start-btn');
-        const micDisplay = document.getElementById('practice-mic-display');
-        practiceStartBtn.disabled = false;
-        practiceStartBtn.style.opacity = '1';
-        practiceStartBtn.style.cursor = 'pointer';
-        micBtn.style.display = 'none';
-        micDisplay.style.display = 'flex'; // 초기 화면으로 복원
-    };
-    
-    speechSynthesis.speak(utterance4);
+    ttsManager.speak(message4, {
+        rate: 0.8,
+        onEnd: () => {
+            practiceIntroStep = 6;
+            // 연습1로 이동 버튼 활성화 (마이크 버튼은 숨기고, 마이크 디스플레이는 다시 표시)
+            const practiceStartBtn = document.getElementById('practice-start-btn');
+            const micDisplay = document.getElementById('practice-mic-display');
+            practiceStartBtn.disabled = false;
+            practiceStartBtn.style.opacity = '1';
+            practiceStartBtn.style.cursor = 'pointer';
+            micBtn.style.display = 'none';
+            micDisplay.style.display = 'flex'; // 초기 화면으로 복원
+        }
+    });
 }
 
 /**
@@ -406,18 +435,13 @@ function playPracticeQuestionAudio(questionText) {
     const currentIndex = assessment.currentPhaseIndex;
     const message = practiceMessages[currentIndex] || practiceMessages[0];
 
-    // 안내 멘트
-    const introUtterance = new SpeechSynthesisUtterance(message);
-    introUtterance.lang = 'ko-KR';
-    introUtterance.rate = 0.7;
-
-    // 안내 멘트가 끝나면 스피커 아이콘 비활성화
-    introUtterance.onend = () => {
-        speaker.classList.remove('active');
-    };
-
-    // 안내 멘트 재생 시작
-    speechSynthesis.speak(introUtterance);
+    // 안내 멘트 재생
+    ttsManager.speak(message, {
+        rate: 0.8,
+        onEnd: () => {
+            speaker.classList.remove('active');
+        }
+    });
 }
 
 /**
@@ -427,15 +451,12 @@ function playQuestionAudio(text) {
     const speaker = document.getElementById('question-speaker');
     speaker.classList.add('active');
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'ko-KR';
-    utterance.rate = 0.7;
-
-    utterance.onend = () => {
-        speaker.classList.remove('active');
-    };
-
-    speechSynthesis.speak(utterance);
+    ttsManager.speak(text, {
+        rate: 0.8,
+        onEnd: () => {
+            speaker.classList.remove('active');
+        }
+    });
 }
 
 /**
@@ -575,18 +596,15 @@ function onRecordingComplete(blobUrl, duration, isPractice) {
                 if (isLastQuestion) {
                     // 문항20: 검사 완료 안내 멘트 재생
                     const completionMessage = '검사가 모두 끝났습니다. 검사 결과를 보려면 아래 검사 결과 보기 버튼을 눌러 주세요. 수고했습니다.';
-                    const completionUtterance = new SpeechSynthesisUtterance(completionMessage);
-                    completionUtterance.lang = 'ko-KR';
-                    completionUtterance.rate = 0.7;
-                    
-                    completionUtterance.onend = () => {
-                        // 멘트 재생 완료 후 버튼 표시
-                        const nextBtn = document.getElementById('next-btn');
-                        nextBtn.style.display = 'block';
-                        nextBtn.textContent = '검사 결과 보기 →';
-                    };
-                    
-                    speechSynthesis.speak(completionUtterance);
+                    ttsManager.speak(completionMessage, {
+                        rate: 0.8,
+                        onEnd: () => {
+                            // 멘트 재생 완료 후 버튼 표시
+                            const nextBtn = document.getElementById('next-btn');
+                            nextBtn.style.display = 'block';
+                            nextBtn.textContent = '검사 결과 보기 →';
+                        }
+                    });
                 } else {
                     // 다음 버튼 표시
                     const nextBtn = document.getElementById('next-btn');
@@ -603,18 +621,15 @@ function onRecordingComplete(blobUrl, duration, isPractice) {
             if (isLastQuestion) {
                 // 문항20: 녹음이 없어도 검사 완료 안내 멘트 재생
                 const completionMessage = '검사가 모두 끝났습니다. 검사 결과를 보려면 아래 검사 결과 보기 버튼을 눌러 주세요. 수고했습니다.';
-                const completionUtterance = new SpeechSynthesisUtterance(completionMessage);
-                completionUtterance.lang = 'ko-KR';
-                completionUtterance.rate = 0.7;
-                
-                completionUtterance.onend = () => {
-                    // 멘트 재생 완료 후 버튼 표시
-                    const nextBtn = document.getElementById('next-btn');
-                    nextBtn.style.display = 'block';
-                    nextBtn.textContent = '검사 결과 보기 →';
-                };
-                
-                speechSynthesis.speak(completionUtterance);
+                ttsManager.speak(completionMessage, {
+                    rate: 0.8,
+                    onEnd: () => {
+                        // 멘트 재생 완료 후 버튼 표시
+                        const nextBtn = document.getElementById('next-btn');
+                        nextBtn.style.display = 'block';
+                        nextBtn.textContent = '검사 결과 보기 →';
+                    }
+                });
             } else {
                 // 다음 버튼 표시
                 const nextBtn = document.getElementById('next-btn');
@@ -665,30 +680,28 @@ function checkAnswer(recognizedText, isPractice) {
         document.getElementById('feedback-text').textContent = '정답입니다!';
         
         // 정답 음성 멘트 재생
-        const correctUtterance = new SpeechSynthesisUtterance('정답입니다.');
-        correctUtterance.lang = 'ko-KR';
-        correctUtterance.rate = 0.7;
+        const correctOptions = {
+            rate: 0.8
+        };
         
         // 연습3인 경우 추가 멘트 재생
         if (isPractice && assessment.currentPhaseIndex === 2) {
-            correctUtterance.onend = () => {
-                const nextMessageUtterance = new SpeechSynthesisUtterance('본 문항으로 이동하려면 아래 본 문항으로 이동 버튼을 눌러 주세요.');
-                nextMessageUtterance.lang = 'ko-KR';
-                nextMessageUtterance.rate = 0.7;
-                speechSynthesis.speak(nextMessageUtterance);
+            correctOptions.onEnd = () => {
+                ttsManager.speak('본 문항으로 이동하려면 아래 본 문항으로 이동 버튼을 눌러 주세요.', {
+                    rate: 0.8
+                });
             };
         }
         
-        speechSynthesis.speak(correctUtterance);
+        ttsManager.speak('정답입니다.', correctOptions);
     } else {
         feedback.className = 'answer-feedback incorrect';
         document.getElementById('feedback-text').textContent = '다시 생각해보세요';
         
         // 오답 음성 멘트 재생
-        const incorrectUtterance = new SpeechSynthesisUtterance('다시 생각해 보세요.');
-        incorrectUtterance.lang = 'ko-KR';
-        incorrectUtterance.rate = 0.7;
-        speechSynthesis.speak(incorrectUtterance);
+        ttsManager.speak('다시 생각해 보세요.', {
+            rate: 0.8
+        });
     }
 
     document.getElementById('recognized-answer').textContent = `인식된 답변: ${recognizedText}`;
@@ -963,3 +976,4 @@ function formatTime(seconds) {
     const secs = seconds % 60;
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
+
